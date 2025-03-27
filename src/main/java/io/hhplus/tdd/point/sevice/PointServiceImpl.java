@@ -34,7 +34,7 @@ public class PointServiceImpl implements PointService {
         userPointTable.insertOrUpdate(usedUserPoint.id(), usedUserPoint.point());
 
         // pointHistory 저장
-        pointHistoryTable.insert(usedUserPoint.id(), usedUserPoint.point(), TransactionType.USE, usedUserPoint.updateMillis());
+        pointHistoryTable.insert(id, amount, TransactionType.USE, usedUserPoint.updateMillis());
 
         return usedUserPoint;
     }
@@ -51,7 +51,7 @@ public class PointServiceImpl implements PointService {
         userPointTable.insertOrUpdate(chargedUserPoint.id(), chargedUserPoint.point());
 
         // pointHistory 저장
-        pointHistoryTable.insert(chargedUserPoint.id(), chargedUserPoint.point(), TransactionType.CHARGE, System.currentTimeMillis());
+        pointHistoryTable.insert(id, amount, TransactionType.CHARGE, System.currentTimeMillis());
 
         return chargedUserPoint;
     }
