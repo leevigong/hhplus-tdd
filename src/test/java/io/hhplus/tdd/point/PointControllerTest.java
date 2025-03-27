@@ -114,7 +114,7 @@ class PointControllerTest {
             long amount = 10001L;
             UserPoint userPoint = new UserPoint(userId, currentPoint, System.currentTimeMillis());
 
-            doThrow(new IllegalArgumentException("최대 충전 포인트(100000)를 초과하였습니다."))
+            doThrow(new IllegalArgumentException(ErrorMessage.EXCEED_MAXIMUM_CHARGE_LIMIT))
                     .when(pointService).chargePoint(anyLong(), anyLong());
 
             // when & then
@@ -124,7 +124,7 @@ class PointControllerTest {
                     .andExpect(result ->
                             assertThat(result.getResolvedException())
                                     .isInstanceOf(IllegalArgumentException.class)
-                                    .hasMessage("최대 충전 포인트(100000)를 초과하였습니다.")
+                                    .hasMessage(ErrorMessage.EXCEED_MAXIMUM_CHARGE_LIMIT)
                     );
         }
 
@@ -154,7 +154,7 @@ class PointControllerTest {
         @Test
         void 사용_포인트가_1보다_작으면_IllegalArgumentException을_반환한다() throws Exception {
             // given
-            doThrow(new IllegalArgumentException("충전 및 사용 포인트는 1 이상이어야 합니다."))
+            doThrow(new IllegalArgumentException(ErrorMessage.MINIMUM_POINT_REQUIRED))
                     .when(pointService).usePoint(anyLong(), eq(0L));
 
             // when & then
@@ -165,7 +165,7 @@ class PointControllerTest {
                     .andExpect(result ->
                             assertThat(result.getResolvedException())
                                     .isInstanceOf(IllegalArgumentException.class)
-                                    .hasMessage("충전 및 사용 포인트는 1 이상이어야 합니다.")
+                                    .hasMessage(ErrorMessage.MINIMUM_POINT_REQUIRED)
                     );
         }
 
@@ -177,7 +177,7 @@ class PointControllerTest {
             long usedAmount = 1001L;
             UserPoint userPoint = new UserPoint(userId, currentPoint, System.currentTimeMillis());
 
-            doThrow(new IllegalArgumentException("포인트가 부족합니다."))
+            doThrow(new IllegalArgumentException(ErrorMessage.INSUFFICIENT_POINTS))
                     .when(pointService).usePoint(anyLong(), anyLong());
 
             // when & then
@@ -188,7 +188,7 @@ class PointControllerTest {
                     .andExpect(result ->
                             assertThat(result.getResolvedException())
                                     .isInstanceOf(IllegalArgumentException.class)
-                                    .hasMessage("포인트가 부족합니다.")
+                                    .hasMessage(ErrorMessage.INSUFFICIENT_POINTS)
                     );
         }
 

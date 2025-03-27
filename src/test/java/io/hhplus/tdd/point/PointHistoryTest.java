@@ -59,7 +59,7 @@ class PointHistoryTest {
         // when & then
         assertThatThrownBy(() -> new PointHistory(historyId, userId, amount, type, System.currentTimeMillis()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("충전 및 사용 포인트는 1 이상이어야 합니다.");
+                .hasMessage(ErrorMessage.MINIMUM_POINT_REQUIRED);
     }
 
     @Test
@@ -73,7 +73,7 @@ class PointHistoryTest {
         // when & then
         assertThatThrownBy(() -> new PointHistory(historyId, userId, amount, type, System.currentTimeMillis()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("충전 및 사용 포인트는 1 이상이어야 합니다.");
+                .hasMessage(ErrorMessage.MINIMUM_POINT_REQUIRED);
     }
     
     @Test
@@ -87,6 +87,6 @@ class PointHistoryTest {
         // when & then
         assertThatThrownBy(() -> new PointHistory(historyId, userId, amount, type, System.currentTimeMillis()))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("TransactionType이 null 입니다.");
+                .hasMessage(ErrorMessage.INVALID_TRANSACTION_TYPE);
     }
 }

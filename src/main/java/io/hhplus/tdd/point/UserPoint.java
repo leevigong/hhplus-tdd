@@ -5,7 +5,7 @@ public record UserPoint(
         long point,
         long updateMillis
 ) {
-    private static final long MAX_USER_POINT = 100_000; // 최대 잔고 한도
+    public static final long MAX_USER_POINT = 100_000; // 최대 잔고 한도
 
     public static UserPoint empty(long id) {
         return new UserPoint(id, 0, System.currentTimeMillis());
@@ -13,13 +13,13 @@ public record UserPoint(
 
     public UserPoint {
         if (point < 0) {
-            throw new IllegalArgumentException("포인트는 음수일 수 없습니다.");
+            throw new IllegalArgumentException(ErrorMessage.NEGATIVE_POINT_NOT_ALLOWED);
         }
     }
 
     public void validateAmount(long amount) {
         if (amount < 1) {
-            throw new IllegalArgumentException("충전 및 사용 포인트는 1 이상이어야 합니다.");
+            throw new IllegalArgumentException(ErrorMessage.MINIMUM_POINT_REQUIRED);
         }
     }
 
@@ -38,9 +38,7 @@ public record UserPoint(
 
         long totalPoint = point + amount;
         if (totalPoint > MAX_USER_POINT) {
-            throw new IllegalArgumentException(
-                    String.format("최대 충전 포인트(%d)를 초과하였습니다.", MAX_USER_POINT)
-            );
+            throw new IllegalArgumentException(ErrorMessage.EXCEED_MAXIMUM_CHARGE_LIMIT);
         }
 
         return new UserPoint(id, totalPoint, System.currentTimeMillis());
@@ -61,7 +59,7 @@ public record UserPoint(
 
         long totalPoint = point - amount;
         if (totalPoint < 0) {
-            throw new IllegalArgumentException("포인트가 부족합니다.");
+            throw new IllegalArgumentException(ErrorMessage.INSUFFICIENT_POINTS);
         }
 
         return new UserPoint(id, totalPoint, System.currentTimeMillis());

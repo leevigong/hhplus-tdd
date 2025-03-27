@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.linesOf;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +30,7 @@ class UserPointTest {
 
         // when & then
         assertThatThrownBy(() -> new UserPoint(userId, point, System.currentTimeMillis()))
-                .hasMessage("포인트는 음수일 수 없습니다.");
+                .hasMessage(ErrorMessage.NEGATIVE_POINT_NOT_ALLOWED);
     }
 
     @Nested
@@ -61,7 +60,7 @@ class UserPointTest {
                     () -> userPoint.charge(amount)
             );
 
-            assertThat(exception.getMessage()).isEqualTo("충전 및 사용 포인트는 1 이상이어야 합니다.");
+            assertThat(exception.getMessage()).isEqualTo(ErrorMessage.MINIMUM_POINT_REQUIRED);
         }
 
         @Test
@@ -73,7 +72,7 @@ class UserPointTest {
             // when & then
             assertThatThrownBy(() -> userPoint.charge(amount))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("최대 충전 포인트(100000)를 초과하였습니다.");
+                    .hasMessage(ErrorMessage.EXCEED_MAXIMUM_CHARGE_LIMIT);
         }
 
         @Test
@@ -85,7 +84,7 @@ class UserPointTest {
             // when & then
             assertThatThrownBy(() -> userPoint.charge(amount))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("최대 충전 포인트(100000)를 초과하였습니다.");
+                    .hasMessage(ErrorMessage.EXCEED_MAXIMUM_CHARGE_LIMIT);
         }
     }
 
@@ -113,7 +112,7 @@ class UserPointTest {
             // when & then
             assertThatThrownBy(() -> userPoint.use(amount))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("충전 및 사용 포인트는 1 이상이어야 합니다.");
+                    .hasMessage(ErrorMessage.MINIMUM_POINT_REQUIRED);
         }
 
         @Test
@@ -125,7 +124,7 @@ class UserPointTest {
             // when & then
             assertThatThrownBy(() -> userPoint.use(amount))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("포인트가 부족합니다.");
+                    .hasMessage(ErrorMessage.INSUFFICIENT_POINTS);
         }
     }
 }
