@@ -103,7 +103,7 @@ class PointServiceTest {
         verify(userPointTable, times(1))    // 포인트 충전 과정에서 userPointTable의 insertOrUpdate 메서드가 한 번 호출되었는지 검증
                 .insertOrUpdate(userId, point + amount);
         verify(pointHistoryTable, times(1)) // 포인트 충전 과정에서 userPointTable의 insert 메서드가 한 번 호출되었는지 검증
-                .insert(eq(userId), eq(point + amount), eq(TransactionType.CHARGE), anyLong());
+                .insert(eq(userId), eq( amount), eq(TransactionType.CHARGE), anyLong());
     }
 
     @Test
@@ -133,6 +133,6 @@ class PointServiceTest {
         verify(userPointTable, times(1))    // 포인트 사용 과정에서 userPointTable의 insertOrUpdate 메서드가 한 번 호출되었는지 검증
                 .insertOrUpdate(userId, point - amount);
         verify(pointHistoryTable, times(1)) // 포인트 사용 과정에서 pointHistoryTable의 insert 메서드가 한 번 호출되었는지 검증
-                .insert(eq(userId), eq(point - amount), eq(TransactionType.USE), anyLong());
+                .insert(eq(userId), eq(amount), eq(TransactionType.USE), anyLong());
     }
 }
