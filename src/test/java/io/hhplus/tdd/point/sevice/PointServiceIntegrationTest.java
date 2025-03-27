@@ -39,7 +39,7 @@ class PointServiceIntegrationTest {
     @Test
     void 유저는_자신의_포인트를_조회할_수_있다() {
         // given
-        long userId = 2L;
+        long userId = 1L;
         long currentPoint = 10000L;
         // 초기 userPoint 세팅
         userPointTable.insertOrUpdate(userId, currentPoint);
@@ -72,11 +72,10 @@ class PointServiceIntegrationTest {
         );
     }
 
-
     @Test
     void 포인트_충전시_포인트가_업데이트되고_충전내역이_저장된다() {
         // given
-        long userId = 1L;
+        long userId = 3L;
         long chargeAmount = 100L;
 
         // when
@@ -99,7 +98,7 @@ class PointServiceIntegrationTest {
     @Test
     void 포인트_충전시_예외가_발생하면_포인트가_업데이트되지_않는다() {
         // given
-        long userId = 2L;
+        long userId = 4L;
         long currentPoint = 10000L;
         long chargeAmount = 90001L; // 최대 잔고 제한을 위배하는 포인트
         // 초기 userPoint 세팅
@@ -122,7 +121,7 @@ class PointServiceIntegrationTest {
     @Test
     void 포인트_사용시_포인트가_업데이트되고_포인트_내역이_저장된다() {
         // given
-        long userId = 3L;
+        long userId = 5L;
         long currentPoint = 1000L;
         long useAmount = 100L;
 
@@ -149,7 +148,7 @@ class PointServiceIntegrationTest {
     @Test
     void 포인트_사용시_에러가_발생하면_포인트가_업데이트되지_않는다() {
         // given
-        long userId = 4L;
+        long userId = 6L;
         long currentPoint = 1000L;
         long useAmount = 1001L; // 현재 보유 포인트보다 큰 포인트
 
@@ -173,7 +172,7 @@ class PointServiceIntegrationTest {
     @Test
     void 포인트_충전_및_사용을_하면_포인트가_누적되어_업데이트되고_내역이_저장된다() {
         // given
-        long userId = 5L;
+        long userId = 7L;
         long chargeAmount1 = 100L;
         long chargeAmount2 = 200L;
         long useAmount = 50L;
@@ -204,11 +203,11 @@ class PointServiceIntegrationTest {
     @Nested
     class 동시성_제어 {
 
-        // NOTE: 서비스 로직에서 동시성 제어 lock 부분 주석 처리 후 테스트 해보면 1개만 처리되며 에러가 발생
+        // NOTE: 서비스 로직에서 동시성 제어 lock 부분 주석 처리 후 테스트 해보면 1개만 처리되어 에러가 발생
         @Test
         void 단일_유저가_동시에_5번의_충전을_요청하면_정상적으로_반영된다() throws InterruptedException {
             // given
-            long userId = 6L;
+            long userId = 8L;
             long chargeAmount = 1000L;
             int threadCount = 5;
 
@@ -247,9 +246,64 @@ class PointServiceIntegrationTest {
         }
 
         @Test
+        void 단일_유저가_동시에_여러번의_충전_및_사용을_요청하면_정상적으로_반영된다() throws InterruptedException {
+            // given
+            long userId = 9L;
+            long chargeAmount = 1000L;
+            long useAmount = 500L;
+            int threadCount = 5;
+
+            userPointTable.insertOrUpdate(userId, 0L);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+
+            // when
+            for (int i = 0; i < threadCount; i++) {
+                final int index = i;
+                executorService.submit(() -> {
+                    try {
+                        log.info("작업 시작 {}", index);
+                        pointService.chargePoint(userId, chargeAmount);
+                        log.info("충전 완료 {}", index);
+                        pointService.usePoint(userId, useAmount);
+                        log.info("사용 완료 {}", index);
+                    } finally {
+                        latch.countDown();
+                        log.info("latch: {}", latch.getCount());
+                    }
+                });
+            }
+            latch.await();
+
+            // then
+            UserPoint userPoint = pointService.getPoint(userId);
+            List<PointHistory> userPointHistory = pointService.getUserPointHistory(userId);
+            assertAll(
+                    () -> assertThat(userPoint.id()).isEqualTo(userId),
+                    () -> assertThat(userPoint.point()).isEqualTo(2500),
+
+                    // 각 스레드마다 충전과 사용 내역이 2건씩 기록되어야 하므로
+                    () -> assertThat(userPointHistory.size()).isEqualTo(threadCount * 2)
+            );
+
+            // 충전 내역과 사용 내역의 개수가 각각 threadCount만큼 있는지 확인
+            long chargeCount = userPointHistory.stream()
+                    .filter(pointHistory -> pointHistory.type() == TransactionType.CHARGE)
+                    .count();
+            long useCount = userPointHistory.stream()
+                    .filter(pointHistory -> pointHistory.type() == TransactionType.USE)
+                    .count();
+            assertAll(
+                    () -> assertThat(chargeCount).isEqualTo(threadCount),
+                    () -> assertThat(useCount).isEqualTo(threadCount)
+            );
+        }
+
+        @Test
         void 서로다른_유저들이_동시에_충전_요청시_동시에_처리된다() throws InterruptedException {
             // given
-            long[] userIds = {7L, 8L, 9L};
+            long[] userIds = {10L, 11L, 12L};
             long chargeAmount = 1000L;
             int threadCount = userIds.length;
 
