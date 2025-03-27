@@ -11,6 +11,7 @@
 
 기대값: 1000L × 5 = 500L   
 실제값: 1000L
+<img width="1571" alt="image" src="https://github.com/user-attachments/assets/bccaf6ca-8704-4b72-9c9a-1b3a582b4916" />
 
 **해당 테스트가 실패한 이유**  
 5개의 스레드가 **거의 동시에 실행되면서** 현재 포인트 값을 읽고 1000을 더한 값을 저장하는 경우를 생각해보면,  
@@ -119,7 +120,7 @@ ExecutorService executorService = Executors.newFixedThreadPool(10);
 CountDownLatch latch = new CountDownLatch(10);
 ```
 
-
+---
 ## 실제 테스트
 ### synchronized
 
