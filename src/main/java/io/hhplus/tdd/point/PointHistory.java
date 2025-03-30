@@ -10,11 +10,11 @@ public record PointHistory(
 
     public PointHistory {
         if (amount < 1) {
-            throw new IllegalArgumentException("충전 및 사용 포인트는 1 이상이어야 합니다.");
+            throw new IllegalArgumentException(ErrorMessage.MINIMUM_POINT_REQUIRED);
         }
 
         if (type == null) {
-            throw new NullPointerException("TransactionType이 null 입니다.");
+            throw new NullPointerException(ErrorMessage.INVALID_TRANSACTION_TYPE);
         }
     }
 }
