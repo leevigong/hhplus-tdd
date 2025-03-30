@@ -1,32 +1,29 @@
-package io.hhplus.tdd.point.sevice;
+package io.hhplus.tdd.point;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import io.hhplus.tdd.point.LockManager;
-import io.hhplus.tdd.point.PointHistory;
-import io.hhplus.tdd.point.TransactionType;
-import io.hhplus.tdd.point.UserPoint;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 
 @Service
-@RequiredArgsConstructor
-public class PointServiceImpl implements PointService {
+public class PointService {
 
     private final UserPointTable userPointTable;
     private final PointHistoryTable pointHistoryTable;
-
     private final LockManager lockManager;
 
-    @Override
+    public PointService(UserPointTable userPointTable, PointHistoryTable pointHistoryTable, LockManager lockManager) {
+        this.userPointTable = userPointTable;
+        this.pointHistoryTable = pointHistoryTable;
+        this.lockManager = lockManager;
+    }
+
     public UserPoint getPoint(Long id) {
         return userPointTable.selectById(id);
     }
 
-    @Override
     public UserPoint usePoint(Long id, long amount) {
         Lock lock = lockManager.getLock(id); // id로 부터 lock을 가져온다
         lock.lock();
@@ -50,7 +47,6 @@ public class PointServiceImpl implements PointService {
         }
     }
 
-    @Override
     public UserPoint chargePoint(Long id, long amount) {
         Lock lock = lockManager.getLock(id); // id로 부터 lock을 가져온다
         lock.lock();
@@ -74,7 +70,6 @@ public class PointServiceImpl implements PointService {
         }
     }
 
-    @Override
     public List<PointHistory> getUserPointHistory(Long userId) {
         return pointHistoryTable.selectAllByUserId(userId);
     }

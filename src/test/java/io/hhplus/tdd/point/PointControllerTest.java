@@ -1,7 +1,6 @@
 package io.hhplus.tdd.point;
 
 
-import io.hhplus.tdd.point.sevice.PointService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
